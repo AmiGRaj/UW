@@ -1,0 +1,42 @@
+install.packages("plm")
+install.packages("writexl")
+
+library(plm)
+library(writexl)
+
+# Suppose you have a panel data frame named panel_data with columns: dependent_variable, independent_variable_1, independent_variable_2, time_variable, and entity_variable
+
+# Load your panel data (Replace this with your actual panel data)
+# panel_data <- read.csv("your_panel_data.csv")
+
+# Convert your panel data to pdata.frame object
+pdata <- pdata.frame(panel_data, index = c("entity_variable", "time_variable"))
+
+# Pooled model
+pooled_model <- plm(dependent_variable ~ independent_variable_1 + independent_variable_2, data = pdata, model = "pooling")
+
+# First-differenced model
+first_diff_model <- plm(dependent_variable ~ independent_variable_1 + independent_variable_2, data = pdata, model = "fd")
+
+# Fixed effects model
+fixed_effects_model <- plm(dependent_variable ~ independent_variable_1 + independent_variable_2, data = pdata, model = "within")
+
+# Random effects model
+random_effects_model <- plm(dependent_variable ~ independent_variable_1 + independent_variable_2, data = pdata, model = "random")
+
+# Extract coefficients and statistics
+pooled_results <- summary(pooled_model)$coefficients
+first_diff_results <- summary(first_diff_model)$coefficients
+fixed_effects_results <- summary(fixed_effects_model)$coefficients
+random_effects_results <- summary(random_effects_model)$coefficients
+
+# Create a data frame to store the results
+results <- data.frame(
+  Pooled_Model = pooled_results,
+  First_Diff_Model = first_diff_results,
+  Fixed_Effects_Model = fixed_effects_results,
+  Random_Effects_Model = random_effects_results
+)
+
+# Write the results to an Excel file
+write_xlsx(results, path = "panel_data_analysis_results.xlsx")
